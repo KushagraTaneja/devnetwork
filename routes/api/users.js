@@ -34,14 +34,16 @@ router.post(
       let user = await User.findOne({ email });
 
       if (user) {
-        return res.status(400).json({ errors: [{ msg: 'User already exists' }] });
+        return res
+          .status(400)
+          .json({ errors: [{ msg: 'User already exists' }] });
       }
 
       const avatar = normalize(
         gravatar.url(email, {
           s: '200',
           r: 'pg',
-          d: 'mm'
+          d: 'mm',
         }),
         { forceHttps: true }
       );
@@ -53,6 +55,12 @@ router.post(
       user.password = await bcrypt.hash(password, salt);
 
       await user.save();
+
+      const payload = {
+        user: {
+          id: user.id,
+        },
+      };
 
       jwt.sign(
         payload,
